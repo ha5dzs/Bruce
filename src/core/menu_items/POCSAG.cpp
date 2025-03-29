@@ -23,12 +23,20 @@ void POCSAGMenu::optionsMenu() {
     loopOptions(options,false,true,"POCSAG");
 }
 
-void POCSAGMenu::draw_icon() {
-    // As per the example.
-    tft.fillRect(iconX,iconY,80,80,BGCOLOR);
+void POCSAGMenu::draw_icon(float scale) {
+    // As per the example, and neighbouring files here.
+    clearIconArea();
+    int iconSize = scale * 60;
+    int radius = scale * 7;
+    int deltaRadius = scale * 10;
 
-    tft.drawArc(19+iconX,45+iconY,12,10,130,230,FGCOLOR,BGCOLOR);
-    tft.drawArc(19+iconX,45+iconY,22,20,130,230,FGCOLOR,BGCOLOR);
-    tft.drawArc(19+iconX,45+iconY,32,30,130,230,FGCOLOR,BGCOLOR);
+    int iconX = iconCenterX - iconSize / 2;
+    int iconY = iconCenterY - iconSize / 2;
+
+    tft.fillRect(iconX,iconY,iconSize,iconSize,bruceConfig.bgColor);
+
+    tft.drawArc(19+iconX,45+iconY,12,10,130,230,bruceConfig.priColor,bruceConfig.bgColor);
+    tft.drawArc(19+iconX,45+iconY,22,20,130,230,bruceConfig.priColor,bruceConfig.bgColor);
+    tft.drawArc(19+iconX,45+iconY,32,30,130,230,bruceConfig.priColor,bruceConfig.bgColor);
     tft.drawCentreString("POCSAG",40+iconX, 50+iconY, SMOOTH_FONT);
 }
