@@ -13,6 +13,7 @@
 #include "menu_items/IRMenu.h"
 #include "menu_items/NRF24.h"
 #include "menu_items/OthersMenu.h"
+#include "menu_items/POCSAGMenu.h"
 #include "menu_items/RFIDMenu.h"
 #include "menu_items/RFMenu.h"
 #include "menu_items/ScriptsMenu.h"
@@ -34,6 +35,7 @@ public:
     RFMenu rfMenu;
     ScriptsMenu scriptsMenu;
     WifiMenu wifiMenu;
+    // POCSAGMenu pocsagMenu;
 
     MainMenu();
     ~MainMenu();
