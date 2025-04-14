@@ -8,10 +8,11 @@
 void POCSAGMenu::optionsMenu() {
     // Options
     options = {
-        {"Set Frequency", [=]() { pocsag_set_frequency(); }},
-        {"Set baud rate", [=]() { pocsag_set_baudrate(); } },
-        {"Transmit",      [=]() { pocsag_transmit(); }     },
-        {"Exit",          [=]() { backToMenu(); }          }
+        // The linker complains that these are not there yet, which is fair. Commented out for now.
+        {"Set Frequency", [=]() { /*pocsag_set_frequency();*/ }},
+        {"Set baud rate", [=]() { /*pocsag_set_baudrate();*/ } },
+        {"Transmit",      [=]() { /*pocsag_transmit();*/ }     },
+        {"Exit",          [=]() { backToMenu(); }              }
     };
 
     addOptionToMainMenu();
@@ -19,7 +20,17 @@ void POCSAGMenu::optionsMenu() {
     loopOptions(options, MENU_TYPE_SUBMENU, "POCSAG");
 }
 
-void POCSAGMenu::draw_icon(float scale) {
+void POCSAGMenu::drawIconImg() {
+    drawImg(
+        *bruceConfig.themeFS(),
+        bruceConfig.getThemeItemImg(bruceConfig.theme.paths.pocsag),
+        0,
+        imgCenterY,
+        true
+    ); // See theme.h, right now a bunch of empty strings.
+}
+
+void POCSAGMenu::drawIcon(float scale) {
     // As per the example, and neighbouring files here.
     clearIconArea();
     int iconSize = scale * 60;

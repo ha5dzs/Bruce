@@ -35,7 +35,7 @@ public:
     RFMenu rfMenu;
     ScriptsMenu scriptsMenu;
     WifiMenu wifiMenu;
-    // POCSAGMenu pocsagMenu;
+    POCSAGMenu pocsagMenu;
 
     MainMenu();
     ~MainMenu();

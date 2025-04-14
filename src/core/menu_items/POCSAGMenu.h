@@ -7,8 +7,11 @@ class POCSAGMenu : public MenuItemInterface {
 public:
     POCSAGMenu() : MenuItemInterface("POCSAG") {}
 
+    // These must be here.
     void optionsMenu(void);
-    void draw_icon(float scale);
+    void drawIcon(float scale);
+    void drawIconImg();
+    bool getTheme() { return bruceConfig.theme.pocsag; } // Set to false in theme.h
 };
 
 #endif

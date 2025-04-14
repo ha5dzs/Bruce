@@ -8,7 +8,7 @@ MainMenu::MainMenu() {
         &bleMenu,
 #if !defined(REMOVE_RF_MENU)
         &rfMenu,
-    //&pocsagMenu,
+        &pocsagMenu,
 #endif
 #if !defined(REMOVE_RFID_MENU)
         &rfidMenu,
