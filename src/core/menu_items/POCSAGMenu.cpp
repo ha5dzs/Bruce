@@ -10,9 +10,11 @@ void POCSAGMenu::optionsMenu() {
     // Options
     options = {
         // The linker complains that these are not there yet, which is fair. Commented out for now.
-        {"Start receiving", [=]() { /*pocsag_receive();*/ }      },
+        {"Start receiving", [=]() { pocsag_receive(); }          },
+        {"Monitor channel", [=]() { /*pocsag_receive();*/ }      },
         {"Set Frequency",   [=]() { /*pocsag_set_frequency();*/ }},
         {"Set baud rate",   [=]() { /*pocsag_set_baudrate();*/ } },
+        {"Set ID",          [=]() { /*pocsag_set_id();*/ }       },
         {"Send message",    [=]() { /*pocsag_transmit();*/ }     },
         {"Exit",            [=]() { backToMenu(); }              }
     };
