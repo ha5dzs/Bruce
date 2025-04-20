@@ -124,8 +124,12 @@ static const uint8_t RX = SERIAL_RX;
 #define LED_ON HIGH
 #define LED_OFF LOW
 
-// FM Radio
-#define FM_SI4713
+// FM Radio. Not included in this board
+// #define FM_SI4713
+
+// This board does not have the NRF24 module.
+#define REMOVE_NRF_MENU
+
 // RFID
 
 #define RFID125_RX_PIN SERIAL_RX

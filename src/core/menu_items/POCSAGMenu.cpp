@@ -4,15 +4,17 @@
 #include "core/settings.h"
 #include "core/utils.h"
 #include "modules/rf/POCSAG.h"
+#include <RadioLib.h>
 
 void POCSAGMenu::optionsMenu() {
     // Options
     options = {
         // The linker complains that these are not there yet, which is fair. Commented out for now.
-        {"Set Frequency", [=]() { /*pocsag_set_frequency();*/ }},
-        {"Set baud rate", [=]() { /*pocsag_set_baudrate();*/ } },
-        {"Transmit",      [=]() { /*pocsag_transmit();*/ }     },
-        {"Exit",          [=]() { backToMenu(); }              }
+        {"Start receiving", [=]() { /*pocsag_receive();*/ }      },
+        {"Set Frequency",   [=]() { /*pocsag_set_frequency();*/ }},
+        {"Set baud rate",   [=]() { /*pocsag_set_baudrate();*/ } },
+        {"Send message",    [=]() { /*pocsag_transmit();*/ }     },
+        {"Exit",            [=]() { backToMenu(); }              }
     };
 
     addOptionToMainMenu();
