@@ -197,15 +197,7 @@ bool initRfModule(String mode, float frequency) {
 
 void deinitRfModule() {
     if (bruceConfig.rfModule == CC1101_SPI_MODULE) {
-        if (bruceConfig.CC1101_bus.mosi == TFT_MOSI ||
-            bruceConfig.CC1101_bus.mosi == bruceConfig.SDCARD_bus.mosi) { // (T_EMBED), CORE2 and others
-            ELECHOUSE_cc1101.setSidle();
-        } else { // (STICK_C_PLUS) || (STICK_C_PLUS2) and others that doesn´t share SPI with other devices
-                 // (need to change it when Bruce board comes to shore)
-#if TFT_MOSI > 0
-            ELECHOUSE_cc1101.getSPIinstance()->end();
-#endif
-        }
+        ELECHOUSE_cc1101.setSidle();
         ioExpander.turnPinOnOff(IO_EXP_CC_RX, LOW);
         ioExpander.turnPinOnOff(IO_EXP_CC_TX, LOW);
     } else digitalWrite(bruceConfig.rfTx, LED_OFF);
@@ -225,11 +217,7 @@ void initCC1101once(SPIClass *SSPI) {
         bruceConfig.CC1101_bus.mosi,
         bruceConfig.CC1101_bus.cs
     );
-    if (bruceConfig.CC1101_bus.io2 != GPIO_NUM_NC)
-        ELECHOUSE_cc1101.setGDO(
-            bruceConfig.CC1101_bus.io0, bruceConfig.CC1101_bus.io2
-        ); // Set Gdo0 (tx) and Gdo2 (rx) for serial transmission function.
-    else ELECHOUSE_cc1101.setGDO0(bruceConfig.CC1101_bus.io0); // use Gdo0 for both Tx and Rx
+    ELECHOUSE_cc1101.setGDO0(bruceConfig.CC1101_bus.io0); // use Gdo0 for both Tx and Rx
 
     return;
 }
@@ -265,22 +253,30 @@ void setMHZ(float frequency) {
         frequency = 433.92;
         Serial.println("Frequency out of band");
     }
-#if defined(T_EMBED_1101)
+#if defined(T_EMBED)
     static uint8_t antenna = 200; // 0=(<300), 1=(350-468), 2=(>778), 200=start to settle at the fisrt time
+    bool change = true;
+#if !defined(T_EMBED_1101)
+    // there's one version of T-Embed (White whith orange wheel) that has CC1101
+    // which antenna has the same circuit as the new CC1101 version with different pinouts
+    // this device uses 17 for CS
+    if (bruceConfig.CC1101_bus.cs != 17) change = false;
+#endif
+
     // SW1:1  SW0:0 --- 315MHz
     // SW1:0  SW0:1 --- 868/915MHz
     // SW1:1  SW0:1 --- 434MHz
-    if (frequency <= 350 && antenna != 0) {
+    if (frequency <= 350 && antenna != 0 && change) {
         digitalWrite(CC1101_SW1_PIN, HIGH);
         digitalWrite(CC1101_SW0_PIN, LOW);
         antenna = 0;
         delay(10); // time to settle the antenna signal
-    } else if (frequency > 350 && frequency < 468 && antenna != 1) {
+    } else if (frequency > 350 && frequency < 468 && antenna != 1 && change) {
         digitalWrite(CC1101_SW1_PIN, HIGH);
         digitalWrite(CC1101_SW0_PIN, HIGH);
         antenna = 1;
         delay(10); // time to settle the antenna signal
-    } else if (frequency > 778 && antenna != 2) {
+    } else if (frequency > 778 && antenna != 2 && change) {
         digitalWrite(CC1101_SW1_PIN, LOW);
         digitalWrite(CC1101_SW0_PIN, HIGH);
         antenna = 2;
