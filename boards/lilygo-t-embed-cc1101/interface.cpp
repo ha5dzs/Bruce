@@ -25,6 +25,7 @@ XPowersPPM PPM;
 #endif
 
 #ifdef USE_BQ27220_VIA_I2C
+#define BATTERY_DESIGN_CAPACITY 1300
 #include <bq27220.h>
 BQ27220 bq;
 #endif
@@ -66,7 +67,7 @@ void _setup_gpio() {
         PPM.setInputCurrentLimit(3250);
         Serial.printf("getInputCurrentLimit: %d mA\n", PPM.getInputCurrentLimit());
         PPM.disableCurrentLimitPin();
-        PPM.setChargeTargetVoltage(4608);
+        PPM.setChargeTargetVoltage(4208);
         PPM.setPrechargeCurr(64);
         PPM.setChargerConstantCurr(832);
         PPM.getChargerConstantCurr();
@@ -75,6 +76,7 @@ void _setup_gpio() {
         PPM.disableOTG();
         PPM.enableCharge();
     }
+    if (bq.getDesignCap() != BATTERY_DESIGN_CAPACITY) { bq.setDesignCap(BATTERY_DESIGN_CAPACITY); }
     // Start with default IR, RF and RFID Configs, replace old
     bruceConfig.rfModule = CC1101_SPI_MODULE;
     bruceConfig.rfidModule = PN532_I2C_MODULE;
@@ -119,10 +121,7 @@ void _setup_gpio() {
 int getBattery() {
     int percent = 0;
 #if defined(USE_BQ27220_VIA_I2C)
-    // percent=bq.getChargePcnt(); // this function runs bq.getRemainCap()/bq.getFullChargeCap()....
-    // bq.getFullChargeCap() is hardcoded int 3000.
-    percent = bq.getRemainCap() / 12; // My battery is 1300mAh and bq.getRemainCap() doesn't go upper than
-                                      // 1200, that is why i'm dividing by 12 (var/1200)*100
+    percent = bq.getChargePcnt();
 #elif defined(T_EMBED)
     uint8_t _batAdcCh = ADC1_GPIO4_CHANNEL;
     uint8_t _batAdcUnit = 1;
@@ -170,43 +169,44 @@ IRAM_ATTR void checkPosition() {
 ** Handles the variables PrevPress, NextPress, SelPress, AnyKeyPress and EscPress
 **********************************************************************/
 void InputHandler(void) {
-    static unsigned long tm = millis();
+    static unsigned long tm = millis();  // debauce for buttons
+    static unsigned long tm2 = millis(); // delay between Select and encoder (avoid missclick)
     static int _last_dir = 0;
+    bool sel = !BTN_ACT;
+    bool esc = !BTN_ACT;
     _last_dir = (int)encoder->getDirection();
-    // pinMode(SEL_BTN, INPUT);
-    if (_last_dir != 0 || digitalRead(SEL_BTN) == BTN_ACT) {
+
+    if (millis() - tm > 200 || LongPress) {
+        sel = digitalRead(SEL_BTN);
+#ifdef T_EMBED_1101
+        esc = digitalRead(BK_BTN);
+#endif
+    }
+    if (_last_dir != 0 || sel == BTN_ACT || esc == BTN_ACT) {
         if (!wakeUpScreen()) AnyKeyPress = true;
-        else goto END;
+        else return;
     }
     if (_last_dir > 0) {
         _last_dir = 0;
-        tm = millis();
         PrevPress = true;
+        tm2 = millis();
     }
     if (_last_dir < 0) {
         _last_dir = 0;
-        tm = millis();
         NextPress = true;
-    }
-    if (digitalRead(SEL_BTN) == BTN_ACT && millis() - tm > 200) {
-        _last_dir = 0;
-        SelPress = true;
+        tm2 = millis();
     }
 
-#ifdef T_EMBED_1101
-    if (digitalRead(BK_BTN) == BTN_ACT && millis() - tm > 200) {
+    if (sel == BTN_ACT && millis() - tm2 > 200) {
+        _last_dir = 0;
+        SelPress = true;
+        tm = millis();
+    }
+    if (esc == BTN_ACT) {
         AnyKeyPress = true;
         EscPress = true;
-    }
-#endif
-END:
-    if (AnyKeyPress) {
+        Serial.println("EscPressed");
         tm = millis();
-        long tmp = millis();
-        while ((millis() - tmp) < 200 && (digitalRead(SEL_BTN) == BTN_ACT));
-#ifdef T_EMBED_1101
-        while ((millis() - tmp) < 200 && (digitalRead(BK_BTN) == BTN_ACT));
-#endif
     }
 }
 
@@ -267,7 +267,7 @@ void checkReboot() {
         // Clear text after releasing the button
         delay(30);
         if (millis() - time_count > 500)
-            tft.fillRect(60, 12, tftWidth - 60, tft.fontHeight(1), bruceConfig.bgColor);
+            tft.fillRect(tftWidth / 2 - 9 * LW, 12, 18 * LW, tft.fontHeight(1), bruceConfig.bgColor);
     }
 #endif
 }
