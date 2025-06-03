@@ -49,5 +49,5 @@ void POCSAGMenu::drawIcon(float scale) {
     tft.drawArc(19 + iconX, 45 + iconY, 12, 10, 130, 230, bruceConfig.priColor, bruceConfig.bgColor);
     tft.drawArc(19 + iconX, 45 + iconY, 22, 20, 130, 230, bruceConfig.priColor, bruceConfig.bgColor);
     tft.drawArc(19 + iconX, 45 + iconY, 32, 30, 130, 230, bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawCentreString("POCSAG", 40 + iconX, 50 + iconY, SMOOTH_FONT);
+    tft.drawCentreString("DAPNET-POCSAG", 40 + iconX, 50 + iconY, SMOOTH_FONT);
 }

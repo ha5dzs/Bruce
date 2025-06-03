@@ -223,7 +223,8 @@ void powerDownNFC() {
     nfc.begin();
     uint32_t versiondata = nfc.getFirmwareVersion();
     if (i2c_check || versiondata) {
-        nfc.powerDown();
+        nfc.reset();
+        // nfc.powerDown(); // This disappeared for some reason
     } else {
         Serial.println("Can't powerDown PN532");
     }
